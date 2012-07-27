@@ -1,0 +1,1450 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Started on 2011-05-22 08:11:39 EDT
+
+SET statement_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = off;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET escape_string_warning = off;
+
+--
+-- TOC entry 367 (class 2612 OID 41651)
+-- Name: plpgsql; Type: PROCEDURAL LANGUAGE; Schema: -; Owner: postgres
+--
+
+CREATE PROCEDURAL LANGUAGE plpgsql;
+
+
+ALTER PROCEDURAL LANGUAGE plpgsql OWNER TO postgres;
+
+SET search_path = public, pg_catalog;
+
+--
+-- TOC entry 19 (class 1255 OID 41652)
+-- Dependencies: 367 6
+-- Name: addattenditem(time without time zone, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION addattenditem(time without time zone, integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	time1 alias for $1;
+	secCode alias for $2;
+	 
+  begin
+	INSERT into attendance (time_, semsubj_id) VALUES (time1, secCode);
+        return;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.addattenditem(time without time zone, integer) OWNER TO postgres;
+
+--
+-- TOC entry 20 (class 1255 OID 41653)
+-- Dependencies: 367 6
+-- Name: addcategory(integer, text, numeric, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION addcategory(integer, text, numeric, text) RETURNS void
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	semsubjId_ alias for $1;
+	catName_ alias for $2;
+	weight_ alias for $3;
+	aggr_ alias for $4;
+        cat_ text;
+        temp_ text;
+  begin
+	INSERT into category (cat_name, weight, semsubj_id, aggregation) VALUES (catName_, weight_, semsubjId_, aggr_);
+	
+        return;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.addcategory(integer, text, numeric, text) OWNER TO postgres;
+
+--
+-- TOC entry 21 (class 1255 OID 41654)
+-- Dependencies: 6 367
+-- Name: getcategories(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION getcategories(integer) RETURNS text
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	semsubjId_ alias for $1;
+        cat_ text;
+        temp_ text;
+  begin
+	cat_ = '';
+        for temp_ in select cat_id||'$'||cat_name||'$'||weight||'$'||aggregation as info from category where semsubj_id = semsubjId_ loop
+		cat_ = cat_||temp_||'@';
+	end loop;
+	
+       
+        return cat_;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.getcategories(integer) OWNER TO postgres;
+
+--
+-- TOC entry 22 (class 1255 OID 41655)
+-- Dependencies: 367 6
+-- Name: getclasses(text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION getclasses(text) RETURNS text
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	profId_ alias for $1;
+        classes_ text;
+        temp_ text;
+  begin
+	classes_ = '';
+        for temp_ in select s.subj_code||'$'||s.description||'$'||ss.schedule||'$'||ss.section_code||'$'||ss.schoolyear||'$'||ss.semsubj_id as info from semsubject ss, subject s where ss.schoolyear = getcurrsem() and ss.fac_id = profId_ and s.subj_code = ss.subj_code order by s.subj_code loop
+		classes_ = classes_||temp_||'@';
+	end loop;
+	
+       
+        return classes_;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.getclasses(text) OWNER TO postgres;
+
+--
+-- TOC entry 23 (class 1255 OID 41656)
+-- Dependencies: 6 367
+-- Name: getcurrsem(); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION getcurrsem() RETURNS text
+    LANGUAGE plpgsql
+    AS $$
+  declare
+        b text;
+  begin
+        select into b schoolyear from sy order by (substring(schoolyear, 7, 4) || substring(schoolyear, 1,1))::numeric desc limit 1;
+	--select into b max(schoolyear) from sy;
+        if b isnull then
+             b = 'NOT FOUND!!!';
+        end if;
+        return b;
+  end;
+$$;
+
+
+ALTER FUNCTION public.getcurrsem() OWNER TO postgres;
+
+--
+-- TOC entry 29 (class 1255 OID 41908)
+-- Dependencies: 6 367
+-- Name: getscale(integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION getscale(integer) RETURNS text
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+        semsubjId_ alias for $1;
+        scale_ text;
+        temp_ text;
+  begin
+	scale_ = '';
+        for temp_ in select scale_id||'$'||rangehigh||'$'||rangelow||'$'||scale as info from scale where semsubj_id = semsubjId_ loop
+		scale_ = scale_||temp_||'@';
+	end loop;
+	
+       
+        return scale_;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.getscale(integer) OWNER TO postgres;
+
+--
+-- TOC entry 24 (class 1255 OID 41657)
+-- Dependencies: 6 367
+-- Name: getstudents(text, text, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION getstudents(text, text, text) RETURNS text
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	secCode_ alias for $1;
+        sy_ alias for $2;
+        subjCode_ alias for $3;
+        temp_ record;
+        studList text;
+  begin
+	studList = '';
+        for temp_ in select s.id||'$'||s.lName||', '||s.fName||' '||s.mName||'$'||r.registration_id as info 
+		     from student s, semstudent ss, registration r, semsubject sb
+		     where sb.subj_code = subjCode_ and sb.schoolyear = sy_ and sb.section_code = secCode_ and sb.semsubj_id = r.semsubj_id and r.semstudent_id = ss.semstudent_id and ss.id = s.id order by s.lName loop
+		studList = studList||temp_.info||'@';
+	end loop;
+	
+       
+        return studList;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.getstudents(text, text, text) OWNER TO postgres;
+
+--
+-- TOC entry 25 (class 1255 OID 41658)
+-- Dependencies: 6 367
+-- Name: login(text, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION login(text, text) RETURNS text
+    LANGUAGE plpgsql
+    AS $_$
+     declare
+        username_ alias for $1;
+        password_ alias for $2; 
+        num_ int;
+        info text;
+        
+     begin
+	SELECT into num_ acct_id from user_account where username = username_ and password = password_;
+
+	SELECT into info fac_id||','||fName||','||mName||','||lName||',faculty'||','||college||','||department as info1 from faculty where acct_id = num_;
+
+	if info isnull then
+		SELECT into info id||','||fName||','||mName||','||lName||',student' as info1 from student where acct_id = num_;
+	end if;
+
+	if info isnull then 
+		info = 'invalid';
+        end if;
+        return info;
+     end;
+  $_$;
+
+
+ALTER FUNCTION public.login(text, text) OWNER TO postgres;
+
+--
+-- TOC entry 26 (class 1255 OID 41659)
+-- Dependencies: 6 367
+-- Name: recstudattend(text, integer); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION recstudattend(text, integer) RETURNS void
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	studId alias for $1;
+	attend_ alias for $2;
+	sss int;
+  begin	
+	SELECT into sss semstudent_id from semstudent where id = studId and schoolyear = getcurrsem() limit 1;
+	INSERT into stud_attendance (semstudent_id, attend_id) VALUES (sss, attend_);
+        return;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.recstudattend(text, integer) OWNER TO postgres;
+
+--
+-- TOC entry 27 (class 1255 OID 41660)
+-- Dependencies: 367 6
+-- Name: remcategory(integer, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION remcategory(integer, text) RETURNS void
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	semsubjId_ alias for $1;
+	catName_ alias for $2;
+
+  begin
+	DELETE from category where cat_name = catName_ and semsubj_id = semsubjId_;
+	
+        return;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.remcategory(integer, text) OWNER TO postgres;
+
+--
+-- TOC entry 28 (class 1255 OID 41661)
+-- Dependencies: 367 6
+-- Name: updatecategory(integer, text, text, numeric, text); Type: FUNCTION; Schema: public; Owner: postgres
+--
+
+CREATE FUNCTION updatecategory(integer, text, text, numeric, text) RETURNS void
+    LANGUAGE plpgsql
+    AS $_$
+  declare
+	semsubjId_ alias for $1;
+	catNameOrig_ alias for $2;
+	catNameUpd_ alias for $3;
+	weight_ alias for $4;
+	aggr_ alias for $5;
+
+  begin
+	Update category set cat_name = catNameUpd_, weight = weight_, aggregation = aggr_ where semsubj_id = semsubjId_ and cat_name = catNameOrig_;
+        return;
+  end;
+$_$;
+
+
+ALTER FUNCTION public.updatecategory(integer, text, text, numeric, text) OWNER TO postgres;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 1554 (class 1259 OID 41662)
+-- Dependencies: 6
+-- Name: attendance; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE attendance (
+    attend_id integer NOT NULL,
+    time_ time without time zone NOT NULL,
+    confirmed boolean,
+    semsubj_id numeric NOT NULL
+);
+
+
+ALTER TABLE public.attendance OWNER TO postgres;
+
+--
+-- TOC entry 1555 (class 1259 OID 41668)
+-- Dependencies: 6 1554
+-- Name: attendance_attend_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE attendance_attend_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.attendance_attend_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1934 (class 0 OID 0)
+-- Dependencies: 1555
+-- Name: attendance_attend_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE attendance_attend_id_seq OWNED BY attendance.attend_id;
+
+
+--
+-- TOC entry 1935 (class 0 OID 0)
+-- Dependencies: 1555
+-- Name: attendance_attend_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('attendance_attend_id_seq', 2, true);
+
+
+--
+-- TOC entry 1556 (class 1259 OID 41670)
+-- Dependencies: 1855 6
+-- Name: category; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE category (
+    cat_id integer NOT NULL,
+    cat_name text NOT NULL,
+    weight numeric DEFAULT 0 NOT NULL,
+    semsubj_id numeric NOT NULL,
+    aggregation text
+);
+
+
+ALTER TABLE public.category OWNER TO postgres;
+
+--
+-- TOC entry 1557 (class 1259 OID 41677)
+-- Dependencies: 1556 6
+-- Name: category_cat_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE category_cat_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.category_cat_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1936 (class 0 OID 0)
+-- Dependencies: 1557
+-- Name: category_cat_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE category_cat_id_seq OWNED BY category.cat_id;
+
+
+--
+-- TOC entry 1937 (class 0 OID 0)
+-- Dependencies: 1557
+-- Name: category_cat_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('category_cat_id_seq', 35, true);
+
+
+--
+-- TOC entry 1558 (class 1259 OID 41679)
+-- Dependencies: 6
+-- Name: exam; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE exam (
+    examid text NOT NULL,
+    answer text,
+    points text,
+    maxscore numeric(100,0),
+    isallow boolean,
+    semsubj_id numeric NOT NULL
+);
+
+
+ALTER TABLE public.exam OWNER TO postgres;
+
+--
+-- TOC entry 1559 (class 1259 OID 41685)
+-- Dependencies: 1857 6
+-- Name: faculty; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE faculty (
+    fac_id text NOT NULL,
+    fname text NOT NULL,
+    mname text NOT NULL,
+    lname text,
+    acct_id integer NOT NULL,
+    college text,
+    department text,
+    picture text DEFAULT 'nopic.jpg'::text
+);
+
+
+ALTER TABLE public.faculty OWNER TO postgres;
+
+--
+-- TOC entry 1560 (class 1259 OID 41692)
+-- Dependencies: 6
+-- Name: grp_performace; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE grp_performace (
+    grp_perf_id numeric NOT NULL,
+    description character varying(150),
+    maxsxore numeric,
+    period character varying(50),
+    cat_id integer NOT NULL
+);
+
+
+ALTER TABLE public.grp_performace OWNER TO postgres;
+
+--
+-- TOC entry 1561 (class 1259 OID 41698)
+-- Dependencies: 6
+-- Name: performance; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE performance (
+    perf_id integer NOT NULL,
+    mult numeric(100,0),
+    score numeric(100,0),
+    registration_id integer NOT NULL,
+    grp_perf_id numeric NOT NULL
+);
+
+
+ALTER TABLE public.performance OWNER TO postgres;
+
+--
+-- TOC entry 1562 (class 1259 OID 41704)
+-- Dependencies: 6 1561
+-- Name: performance_perf_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE performance_perf_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.performance_perf_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1938 (class 0 OID 0)
+-- Dependencies: 1562
+-- Name: performance_perf_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE performance_perf_id_seq OWNED BY performance.perf_id;
+
+
+--
+-- TOC entry 1939 (class 0 OID 0)
+-- Dependencies: 1562
+-- Name: performance_perf_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('performance_perf_id_seq', 1, false);
+
+
+--
+-- TOC entry 1563 (class 1259 OID 41706)
+-- Dependencies: 6
+-- Name: registration; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE registration (
+    registration_id integer NOT NULL,
+    final_grade numeric(1,1),
+    semstudent_id integer NOT NULL,
+    semsubj_id numeric NOT NULL
+);
+
+
+ALTER TABLE public.registration OWNER TO postgres;
+
+--
+-- TOC entry 1564 (class 1259 OID 41712)
+-- Dependencies: 6 1563
+-- Name: registration_registration_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE registration_registration_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.registration_registration_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1940 (class 0 OID 0)
+-- Dependencies: 1564
+-- Name: registration_registration_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE registration_registration_id_seq OWNED BY registration.registration_id;
+
+
+--
+-- TOC entry 1941 (class 0 OID 0)
+-- Dependencies: 1564
+-- Name: registration_registration_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('registration_registration_id_seq', 2, true);
+
+
+--
+-- TOC entry 1565 (class 1259 OID 41714)
+-- Dependencies: 6
+-- Name: scale; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE scale (
+    scale_id integer NOT NULL,
+    scale text NOT NULL,
+    rangehigh double precision NOT NULL,
+    rangelow double precision NOT NULL,
+    semsubj_id numeric NOT NULL
+);
+
+
+ALTER TABLE public.scale OWNER TO postgres;
+
+--
+-- TOC entry 1566 (class 1259 OID 41720)
+-- Dependencies: 1565 6
+-- Name: scale_scale_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE scale_scale_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.scale_scale_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1942 (class 0 OID 0)
+-- Dependencies: 1566
+-- Name: scale_scale_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE scale_scale_id_seq OWNED BY scale.scale_id;
+
+
+--
+-- TOC entry 1943 (class 0 OID 0)
+-- Dependencies: 1566
+-- Name: scale_scale_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('scale_scale_id_seq', 16, true);
+
+
+--
+-- TOC entry 1567 (class 1259 OID 41722)
+-- Dependencies: 6
+-- Name: semstudent; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE semstudent (
+    semstudent_id integer NOT NULL,
+    studlevel text,
+    course text,
+    schoolyear text NOT NULL,
+    id text NOT NULL
+);
+
+
+ALTER TABLE public.semstudent OWNER TO postgres;
+
+--
+-- TOC entry 1568 (class 1259 OID 41728)
+-- Dependencies: 6 1567
+-- Name: semstudent_semstudent_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE semstudent_semstudent_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.semstudent_semstudent_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1944 (class 0 OID 0)
+-- Dependencies: 1568
+-- Name: semstudent_semstudent_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE semstudent_semstudent_id_seq OWNED BY semstudent.semstudent_id;
+
+
+--
+-- TOC entry 1945 (class 0 OID 0)
+-- Dependencies: 1568
+-- Name: semstudent_semstudent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('semstudent_semstudent_id_seq', 5, true);
+
+
+--
+-- TOC entry 1569 (class 1259 OID 41730)
+-- Dependencies: 6
+-- Name: semsubject; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE semsubject (
+    semsubj_id numeric NOT NULL,
+    fac_id text NOT NULL,
+    schoolyear text NOT NULL,
+    subj_code text NOT NULL,
+    schedule text NOT NULL,
+    section_code text
+);
+
+
+ALTER TABLE public.semsubject OWNER TO postgres;
+
+--
+-- TOC entry 1570 (class 1259 OID 41736)
+-- Dependencies: 6
+-- Name: stuanswer; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE stuanswer (
+    ansfrom integer NOT NULL,
+    answer text,
+    "time" timestamp without time zone,
+    examid text NOT NULL,
+    semstudent_id integer NOT NULL
+);
+
+
+ALTER TABLE public.stuanswer OWNER TO postgres;
+
+--
+-- TOC entry 1571 (class 1259 OID 41742)
+-- Dependencies: 6
+-- Name: stud_attendance; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE stud_attendance (
+    semstudent_id integer NOT NULL,
+    attend_id integer NOT NULL
+);
+
+
+ALTER TABLE public.stud_attendance OWNER TO postgres;
+
+--
+-- TOC entry 1572 (class 1259 OID 41745)
+-- Dependencies: 6
+-- Name: student; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE student (
+    id text NOT NULL,
+    fname text,
+    mname text,
+    lname text,
+    acct_id integer NOT NULL
+);
+
+
+ALTER TABLE public.student OWNER TO postgres;
+
+--
+-- TOC entry 1573 (class 1259 OID 41751)
+-- Dependencies: 6
+-- Name: subject; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE subject (
+    subj_code text NOT NULL,
+    type text,
+    description text NOT NULL
+);
+
+
+ALTER TABLE public.subject OWNER TO postgres;
+
+--
+-- TOC entry 1574 (class 1259 OID 41757)
+-- Dependencies: 6
+-- Name: sy; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE sy (
+    schoolyear text NOT NULL
+);
+
+
+ALTER TABLE public.sy OWNER TO postgres;
+
+--
+-- TOC entry 1575 (class 1259 OID 41763)
+-- Dependencies: 6
+-- Name: user_account; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+--
+
+CREATE TABLE user_account (
+    acct_id integer NOT NULL,
+    username text NOT NULL,
+    password text NOT NULL
+);
+
+
+ALTER TABLE public.user_account OWNER TO postgres;
+
+--
+-- TOC entry 1576 (class 1259 OID 41769)
+-- Dependencies: 6 1575
+-- Name: user_account_acct_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE user_account_acct_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MAXVALUE
+    NO MINVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.user_account_acct_id_seq OWNER TO postgres;
+
+--
+-- TOC entry 1946 (class 0 OID 0)
+-- Dependencies: 1576
+-- Name: user_account_acct_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE user_account_acct_id_seq OWNED BY user_account.acct_id;
+
+
+--
+-- TOC entry 1947 (class 0 OID 0)
+-- Dependencies: 1576
+-- Name: user_account_acct_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('user_account_acct_id_seq', 3, true);
+
+
+--
+-- TOC entry 1854 (class 2604 OID 41923)
+-- Dependencies: 1555 1554
+-- Name: attend_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE attendance ALTER COLUMN attend_id SET DEFAULT nextval('attendance_attend_id_seq'::regclass);
+
+
+--
+-- TOC entry 1856 (class 2604 OID 41924)
+-- Dependencies: 1557 1556
+-- Name: cat_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE category ALTER COLUMN cat_id SET DEFAULT nextval('category_cat_id_seq'::regclass);
+
+
+--
+-- TOC entry 1858 (class 2604 OID 41925)
+-- Dependencies: 1562 1561
+-- Name: perf_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE performance ALTER COLUMN perf_id SET DEFAULT nextval('performance_perf_id_seq'::regclass);
+
+
+--
+-- TOC entry 1859 (class 2604 OID 41926)
+-- Dependencies: 1564 1563
+-- Name: registration_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE registration ALTER COLUMN registration_id SET DEFAULT nextval('registration_registration_id_seq'::regclass);
+
+
+--
+-- TOC entry 1860 (class 2604 OID 41927)
+-- Dependencies: 1566 1565
+-- Name: scale_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE scale ALTER COLUMN scale_id SET DEFAULT nextval('scale_scale_id_seq'::regclass);
+
+
+--
+-- TOC entry 1861 (class 2604 OID 41928)
+-- Dependencies: 1568 1567
+-- Name: semstudent_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE semstudent ALTER COLUMN semstudent_id SET DEFAULT nextval('semstudent_semstudent_id_seq'::regclass);
+
+
+--
+-- TOC entry 1862 (class 2604 OID 41929)
+-- Dependencies: 1576 1575
+-- Name: acct_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE user_account ALTER COLUMN acct_id SET DEFAULT nextval('user_account_acct_id_seq'::regclass);
+
+
+--
+-- TOC entry 1913 (class 0 OID 41662)
+-- Dependencies: 1554
+-- Data for Name: attendance; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY attendance (attend_id, time_, confirmed, semsubj_id) FROM stdin;
+1	12:53:30.643058	\N	1
+2	12:53:00	\N	1
+\.
+
+
+--
+-- TOC entry 1914 (class 0 OID 41670)
+-- Dependencies: 1556
+-- Data for Name: category; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY category (cat_id, cat_name, weight, semsubj_id, aggregation) FROM stdin;
+1	MajorExam	30	1	Weighted Mean of Grades
+2	OralRecitation	30	1	Weighted Mean of Grades
+33	Quizzes	20	1	Weighted Mean of Grades
+34	Assignments	15	1	Weighted Mean of Grades
+35	Attendance	5	1	Weighted Mean of Grades
+\.
+
+
+--
+-- TOC entry 1915 (class 0 OID 41679)
+-- Dependencies: 1558
+-- Data for Name: exam; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY exam (examid, answer, points, maxscore, isallow, semsubj_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 1916 (class 0 OID 41685)
+-- Dependencies: 1559
+-- Data for Name: faculty; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY faculty (fac_id, fname, mname, lname, acct_id, college, department, picture) FROM stdin;
+2007-0381	Maria	Ambot	Aguanta	1	SCS	IT	nopic.jpg
+\.
+
+
+--
+-- TOC entry 1917 (class 0 OID 41692)
+-- Dependencies: 1560
+-- Data for Name: grp_performace; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY grp_performace (grp_perf_id, description, maxsxore, period, cat_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 1918 (class 0 OID 41698)
+-- Dependencies: 1561
+-- Data for Name: performance; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY performance (perf_id, mult, score, registration_id, grp_perf_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 1919 (class 0 OID 41706)
+-- Dependencies: 1563
+-- Data for Name: registration; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY registration (registration_id, final_grade, semstudent_id, semsubj_id) FROM stdin;
+1	\N	1	1
+2	\N	4	1
+\.
+
+
+--
+-- TOC entry 1920 (class 0 OID 41714)
+-- Dependencies: 1565
+-- Data for Name: scale; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY scale (scale_id, scale, rangehigh, rangelow, semsubj_id) FROM stdin;
+1	1.00	100	98	1
+2	1.25	97.989999999999995	92	1
+3	1.50	91.989999999999995	86	1
+4	1.75	85.989999999999995	80	1
+5	2.00	79.989999999999995	74	1
+6	2.25	73.989999999999995	68	1
+7	2.50	67.989999999999995	62	1
+8	2.75	61.990000000000002	56	1
+9	3.00	55.990000000000002	50	1
+10	INC	49.990000000000002	40	1
+11	5.00	39.990000000000002	0	1
+\.
+
+
+--
+-- TOC entry 1921 (class 0 OID 41722)
+-- Dependencies: 1567
+-- Data for Name: semstudent; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY semstudent (semstudent_id, studlevel, course, schoolyear, id) FROM stdin;
+1	4	BSIT	2ndsem0910	2007-0381
+4	4	BSIT	2ndsem0910	2007-0001
+\.
+
+
+--
+-- TOC entry 1922 (class 0 OID 41730)
+-- Dependencies: 1569
+-- Data for Name: semsubject; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY semsubject (semsubj_id, fac_id, schoolyear, subj_code, schedule, section_code) FROM stdin;
+1	2007-0381	2ndsem0910	IT110	MWF	A1
+2	2007-0381	2ndsem0910	IT120	TTh	B
+\.
+
+
+--
+-- TOC entry 1923 (class 0 OID 41736)
+-- Dependencies: 1570
+-- Data for Name: stuanswer; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY stuanswer (ansfrom, answer, "time", examid, semstudent_id) FROM stdin;
+\.
+
+
+--
+-- TOC entry 1924 (class 0 OID 41742)
+-- Dependencies: 1571
+-- Data for Name: stud_attendance; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY stud_attendance (semstudent_id, attend_id) FROM stdin;
+4	1
+4	1
+\.
+
+
+--
+-- TOC entry 1925 (class 0 OID 41745)
+-- Dependencies: 1572
+-- Data for Name: student; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY student (id, fname, mname, lname, acct_id) FROM stdin;
+2007-0381	julius	mercons	masanting	2
+2007-0001	Maria	Ambot	Aguanta	3
+\.
+
+
+--
+-- TOC entry 1926 (class 0 OID 41751)
+-- Dependencies: 1573
+-- Data for Name: subject; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY subject (subj_code, type, description) FROM stdin;
+IT110	Lecture	Fundamentals of logic and algorithm
+CSC101	Lecture / Laboratory	Computer Programming 1
+CSC-121	Lecture	Data Structures 1
+IT120	Lecture	Basic Switching Theory and Introduction to Assembly Language
+CSC-122	Lecture	Data Structures II
+\.
+
+
+--
+-- TOC entry 1927 (class 0 OID 41757)
+-- Dependencies: 1574
+-- Data for Name: sy; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY sy (schoolyear) FROM stdin;
+2ndsem0910
+1stsem0910
+\.
+
+
+--
+-- TOC entry 1928 (class 0 OID 41763)
+-- Dependencies: 1575
+-- Data for Name: user_account; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY user_account (acct_id, username, password) FROM stdin;
+3	maria	aguanta
+1	ADMIN	ADMIN
+2	admin	admin
+\.
+
+
+--
+-- TOC entry 1864 (class 2606 OID 41779)
+-- Dependencies: 1554 1554
+-- Name: attendance_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY attendance
+    ADD CONSTRAINT attendance_pkey PRIMARY KEY (attend_id);
+
+
+--
+-- TOC entry 1866 (class 2606 OID 41781)
+-- Dependencies: 1556 1556
+-- Name: category_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY category
+    ADD CONSTRAINT category_pkey PRIMARY KEY (cat_id);
+
+
+--
+-- TOC entry 1868 (class 2606 OID 41783)
+-- Dependencies: 1558 1558
+-- Name: exam_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY exam
+    ADD CONSTRAINT exam_pkey PRIMARY KEY (examid);
+
+
+--
+-- TOC entry 1870 (class 2606 OID 41785)
+-- Dependencies: 1559 1559
+-- Name: faculty_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY faculty
+    ADD CONSTRAINT faculty_pkey PRIMARY KEY (fac_id);
+
+
+--
+-- TOC entry 1872 (class 2606 OID 41787)
+-- Dependencies: 1560 1560
+-- Name: grp_performace_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY grp_performace
+    ADD CONSTRAINT grp_performace_pkey PRIMARY KEY (grp_perf_id);
+
+
+--
+-- TOC entry 1874 (class 2606 OID 41789)
+-- Dependencies: 1561 1561
+-- Name: performance_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY performance
+    ADD CONSTRAINT performance_pkey PRIMARY KEY (perf_id);
+
+
+--
+-- TOC entry 1876 (class 2606 OID 41791)
+-- Dependencies: 1563 1563
+-- Name: registration_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY registration
+    ADD CONSTRAINT registration_pkey PRIMARY KEY (registration_id);
+
+
+--
+-- TOC entry 1878 (class 2606 OID 41793)
+-- Dependencies: 1565 1565
+-- Name: scale_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY scale
+    ADD CONSTRAINT scale_pkey PRIMARY KEY (scale_id);
+
+
+--
+-- TOC entry 1880 (class 2606 OID 41795)
+-- Dependencies: 1567 1567
+-- Name: semstudent_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY semstudent
+    ADD CONSTRAINT semstudent_pkey PRIMARY KEY (semstudent_id);
+
+
+--
+-- TOC entry 1882 (class 2606 OID 41797)
+-- Dependencies: 1569 1569
+-- Name: semsubject_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY semsubject
+    ADD CONSTRAINT semsubject_pkey PRIMARY KEY (semsubj_id);
+
+
+--
+-- TOC entry 1884 (class 2606 OID 41799)
+-- Dependencies: 1570 1570
+-- Name: stuanswer_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY stuanswer
+    ADD CONSTRAINT stuanswer_pkey PRIMARY KEY (ansfrom);
+
+
+--
+-- TOC entry 1886 (class 2606 OID 41801)
+-- Dependencies: 1572 1572
+-- Name: student_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY student
+    ADD CONSTRAINT student_pkey PRIMARY KEY (id);
+
+
+--
+-- TOC entry 1888 (class 2606 OID 41803)
+-- Dependencies: 1573 1573
+-- Name: subject_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY subject
+    ADD CONSTRAINT subject_pkey PRIMARY KEY (subj_code);
+
+
+--
+-- TOC entry 1890 (class 2606 OID 41805)
+-- Dependencies: 1574 1574
+-- Name: sy_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY sy
+    ADD CONSTRAINT sy_pkey PRIMARY KEY (schoolyear);
+
+
+--
+-- TOC entry 1892 (class 2606 OID 41807)
+-- Dependencies: 1575 1575
+-- Name: user_account_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
+--
+
+ALTER TABLE ONLY user_account
+    ADD CONSTRAINT user_account_pkey PRIMARY KEY (acct_id);
+
+
+--
+-- TOC entry 1893 (class 2606 OID 41808)
+-- Dependencies: 1554 1569 1881
+-- Name: attendance_semsubj_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY attendance
+    ADD CONSTRAINT attendance_semsubj_id_fkey FOREIGN KEY (semsubj_id) REFERENCES semsubject(semsubj_id);
+
+
+--
+-- TOC entry 1894 (class 2606 OID 41813)
+-- Dependencies: 1881 1569 1556
+-- Name: category_semsubj_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY category
+    ADD CONSTRAINT category_semsubj_id_fkey FOREIGN KEY (semsubj_id) REFERENCES semsubject(semsubj_id);
+
+
+--
+-- TOC entry 1895 (class 2606 OID 41818)
+-- Dependencies: 1569 1558 1881
+-- Name: exam_semsubj_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY exam
+    ADD CONSTRAINT exam_semsubj_id_fkey FOREIGN KEY (semsubj_id) REFERENCES semsubject(semsubj_id);
+
+
+--
+-- TOC entry 1896 (class 2606 OID 41823)
+-- Dependencies: 1575 1559 1891
+-- Name: faculty_acct_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY faculty
+    ADD CONSTRAINT faculty_acct_id_fkey FOREIGN KEY (acct_id) REFERENCES user_account(acct_id);
+
+
+--
+-- TOC entry 1897 (class 2606 OID 41828)
+-- Dependencies: 1865 1556 1560
+-- Name: grp_performace_cat_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY grp_performace
+    ADD CONSTRAINT grp_performace_cat_id_fkey FOREIGN KEY (cat_id) REFERENCES category(cat_id);
+
+
+--
+-- TOC entry 1898 (class 2606 OID 41833)
+-- Dependencies: 1871 1561 1560
+-- Name: performance_grp_perf_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY performance
+    ADD CONSTRAINT performance_grp_perf_id_fkey FOREIGN KEY (grp_perf_id) REFERENCES grp_performace(grp_perf_id);
+
+
+--
+-- TOC entry 1899 (class 2606 OID 41838)
+-- Dependencies: 1875 1561 1563
+-- Name: performance_registration_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY performance
+    ADD CONSTRAINT performance_registration_id_fkey FOREIGN KEY (registration_id) REFERENCES registration(registration_id);
+
+
+--
+-- TOC entry 1900 (class 2606 OID 41843)
+-- Dependencies: 1567 1879 1563
+-- Name: registration_semstudent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY registration
+    ADD CONSTRAINT registration_semstudent_id_fkey FOREIGN KEY (semstudent_id) REFERENCES semstudent(semstudent_id);
+
+
+--
+-- TOC entry 1901 (class 2606 OID 41848)
+-- Dependencies: 1563 1569 1881
+-- Name: registration_semsubj_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY registration
+    ADD CONSTRAINT registration_semsubj_id_fkey FOREIGN KEY (semsubj_id) REFERENCES semsubject(semsubj_id);
+
+
+--
+-- TOC entry 1902 (class 2606 OID 41853)
+-- Dependencies: 1565 1569 1881
+-- Name: scale_semsubj_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY scale
+    ADD CONSTRAINT scale_semsubj_id_fkey FOREIGN KEY (semsubj_id) REFERENCES semsubject(semsubj_id);
+
+
+--
+-- TOC entry 1903 (class 2606 OID 41858)
+-- Dependencies: 1567 1572 1885
+-- Name: semstudent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY semstudent
+    ADD CONSTRAINT semstudent_id_fkey FOREIGN KEY (id) REFERENCES student(id);
+
+
+--
+-- TOC entry 1904 (class 2606 OID 41863)
+-- Dependencies: 1567 1574 1889
+-- Name: semstudent_schoolyear_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY semstudent
+    ADD CONSTRAINT semstudent_schoolyear_fkey FOREIGN KEY (schoolyear) REFERENCES sy(schoolyear);
+
+
+--
+-- TOC entry 1905 (class 2606 OID 41868)
+-- Dependencies: 1569 1559 1869
+-- Name: semsubject_fac_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY semsubject
+    ADD CONSTRAINT semsubject_fac_id_fkey FOREIGN KEY (fac_id) REFERENCES faculty(fac_id);
+
+
+--
+-- TOC entry 1906 (class 2606 OID 41873)
+-- Dependencies: 1569 1574 1889
+-- Name: semsubject_schoolyear_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY semsubject
+    ADD CONSTRAINT semsubject_schoolyear_fkey FOREIGN KEY (schoolyear) REFERENCES sy(schoolyear);
+
+
+--
+-- TOC entry 1907 (class 2606 OID 41878)
+-- Dependencies: 1573 1887 1569
+-- Name: semsubject_subj_code_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY semsubject
+    ADD CONSTRAINT semsubject_subj_code_fkey FOREIGN KEY (subj_code) REFERENCES subject(subj_code);
+
+
+--
+-- TOC entry 1908 (class 2606 OID 41883)
+-- Dependencies: 1570 1867 1558
+-- Name: stuanswer_examid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY stuanswer
+    ADD CONSTRAINT stuanswer_examid_fkey FOREIGN KEY (examid) REFERENCES exam(examid);
+
+
+--
+-- TOC entry 1909 (class 2606 OID 41888)
+-- Dependencies: 1570 1879 1567
+-- Name: stuanswer_semstudent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY stuanswer
+    ADD CONSTRAINT stuanswer_semstudent_id_fkey FOREIGN KEY (semstudent_id) REFERENCES semstudent(semstudent_id);
+
+
+--
+-- TOC entry 1910 (class 2606 OID 41893)
+-- Dependencies: 1863 1554 1571
+-- Name: stud_attendance_attend_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY stud_attendance
+    ADD CONSTRAINT stud_attendance_attend_id_fkey FOREIGN KEY (attend_id) REFERENCES attendance(attend_id);
+
+
+--
+-- TOC entry 1911 (class 2606 OID 41898)
+-- Dependencies: 1567 1879 1571
+-- Name: stud_attendance_semstudent_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY stud_attendance
+    ADD CONSTRAINT stud_attendance_semstudent_id_fkey FOREIGN KEY (semstudent_id) REFERENCES semstudent(semstudent_id);
+
+
+--
+-- TOC entry 1912 (class 2606 OID 41903)
+-- Dependencies: 1575 1891 1572
+-- Name: student_acct_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY student
+    ADD CONSTRAINT student_acct_id_fkey FOREIGN KEY (acct_id) REFERENCES user_account(acct_id);
+
+
+--
+-- TOC entry 1933 (class 0 OID 0)
+-- Dependencies: 6
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+-- Completed on 2011-05-22 08:11:40 EDT
+
+--
+-- PostgreSQL database dump complete
+--
+

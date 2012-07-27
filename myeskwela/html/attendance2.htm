@@ -1,0 +1,311 @@
+<html>
+  <head>
+     <link rel="stylesheet" type="text/css" href="jquery/css/south-street/jquery-ui-1.8.9.custom.css" />
+      <script type="text/javascript" src="jquery/js/jquery-1.4.4.min.js"> </script>
+      <script type="text/javascript" src="jquery/js/jquery-ui-1.8.9.custom.min.js"></script>
+      <script type="text/javascript" src="apMessage.js"></script>
+     <script type="text/javascript">
+          //----------
+		  
+function isThere(id_,time_) {
+     try {
+     	 val = document.getElementById(id_).value
+	  document.getElementById(id_ + "tym").value = time_
+	  res = true
+	}
+    catch(err){
+	   res = false;
+	}
+return res;
+}
+
+jQuery.extend({
+     getValues: function(url){ //+++
+          var result = null;
+          $.ajax({
+             url:url,
+             type: 'get', 
+             dataType:'text',
+             async:false,
+             success: function(data){
+                  result = data;
+  
+             }
+//error: function () {}
+          });//ajax
+       return result;
+     } //+++
+}); //extend          
+//usage:
+//var results = $.getValues("url string");
+//----------
+$(document).ready(function() {
+$("input#sections").autocomplete({
+source: ["CENG1","CENG2"] 
+}); //autocomplete
+
+$("button").button(); //button
+
+$("#tabs").tabs(); //tabs
+$("#radio").buttonset(); //radio
+
+$("button").click(
+function ()
+ {
+    if (document.getElementById("sections").value.length > 0)
+       {
+              document.getElementById("frmpic").src = "pics/anonymous.jpg";
+              document.getElementById("dfname").value = ""
+              document.getElementById("dftimein").value = ""
+              $("#attendance-form").dialog("open");
+       }
+    else
+       $("#warning").dialog("open");
+ }
+);
+
+$("#attendance-form").dialog({
+autoOpen:false,
+height: 350,
+width:350,
+modal: true,
+buttons: {
+ "Close": function () {$(this).dialog("close");}
+} //buttons
+}); //attendance form
+
+$("#warning").dialog({
+autoOpen: false,
+show: "highlight",
+hide: "explode",
+buttons: {
+  "Ok": function () {$(this).dialog("close");}
+}
+});            
+
+
+$("#dfidnumber").keypress(
+function (event) 
+{ 
+var idnumber=$('input[name="dfidnumber"]').attr('value'); //get value from input text
+var sections=$('input[name="sections"]').attr('value'); //get value from input text
+var islec=$('input[id="radio1"]').attr('checked');
+var l = "";
+if (islec)
+l = "-LEC";
+else                   
+l = "-LAB";
+
+if (event.which == '13')
+{
+var results = $.getValues("http://10.10.34.80/sites/studentid?idnumber=" + idnumber + "&section=" + sections + l);
+var items = results.split("<>");
+   
+
+/*document.getElementById("dfname").value = sections
+document.getElementById("dftimein").value = results
+document.getElementById("frmpic").src = "pics/" + idnumber + ".jpg"
+*/
+// document.getElementById("dfname").value = results;
+      
+
+       var xid = items[0];
+       if (xid.search("Err")  == -1) { 
+       		       var xname = items[1];
+       		var xlogtime = items[2];
+       		var xacount = items[3];
+       		var xpic  = items[4];
+        
+        
+        	document.getElementById("dfname").value = xname;
+		document.getElementById("dftimein").value = xlogtime;
+		document.getElementById("frmpic").src = "pics/" + xpic + ".jpg"
+        	document.getElementById("dfattcount").value = xacount;
+           if (!isThere(xid,xlogtime))
+					         {
+      		        $("#students_attendance tbody").append("<tr>" +
+	    				         "<td id=\"" + xid + "\">" + xid + "</td>" + 
+					             "<td>" + xname + "</td>" + 
+					             "<td id =\"" + xid + "tym\">" + xlogtime + "</td>" +		
+					             "</tr>");
+                 }                                 
+
+					 }
+			
+           
+      else
+            { 
+						  
+							apMessageBox.error({
+									title: "An error occured!",
+									message: xid
+								});
+                
+							/*
+							apMessageBox.information({
+									title: "Something Good",
+									message: "Information to show here!"
+								});
+						     */
+						document.getElementById("dfname").value = ""; 
+              document.getElementById("dftimein").value = "";
+	      document.getElementById("frmpic").src = "pics/anonymous.jpg"
+              document.getElementById("dfattcount").value = "";}
+      document.getElementById("dfidnumber").value = "";
+//$('input[name="dfname"]').focus();
+}  
+}
+); //keypress              
+}); //document on ready
+/* adding a data to the table
+var country=$('select[name="country"]').attr('value'); //get value from comisTherebo box
+var txt=$('input[name="city"]').attr('value'); //get value from input text
+
+$( "#students_attendance tbody" ).append( "<tr>" +
+				"<td>" + name.val() + "</td>" + 
+				"<td>" + email.val() + "</td>" + 
+				"<td>" + password.val() + "</td>" +
+			"</tr>" ); 
+
+*/
+</script>  
+    
+    <style type="text/css">
+	  body{ font: 80% "Trebuchet MS", sans-serif; margin: 50px;}
+          .textbox {
+            font: Arial, Sans-serif;
+            margin-bottom: 5px;
+            display: block;
+            padding: solid;
+            border:solid 1px;
+            width: 150px; 
+	   }  
+         
+           img.r50 {
+               border:0,
+               margin:0 10px;
+               width:100px;
+               height:150px;
+           }
+           
+          
+           label { display:block; }
+
+           fieldset { padding:0; border:0; margin-top:25px; }
+           div#dvattendance { width: 350px; margin: 20px 0; }
+           div#dvattendance p, td, th {font: 0.9em Arial, Helvetica, sans-serif; white-space:nowrap;} 
+	   div#dvattendance table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+	   div#dvattendance table td, div#dvattendance table th { border: 1px solid #D6DDE6; padding: .6em 10px; text-align: left;}
+	   div#dvattendance table tr:hover {
+  		background-color: #A9F5A9;
+  		color: #000000;}
+
+           div#dvattendance table  th {
+	  	border: 1px solid #828282;
+  		background-color: #BCBCBC;
+  		font-weight: bold;
+  		text-align: left;
+  		padding-left: 4px;
+	  }  
+         
+          div#dvattendance caption {
+  		font: bold 0.9em Arial, Helvetica, sans-serif;
+  		color: #33517A;
+  		text-align: left;
+  		padding-top: 3px;
+  		padding-bottom: 8px;
+	}
+         
+           .ui-dialog .ui-state-error { padding: .3em; }
+	   .validateTips { border: 1px solid transparent; padding: 0.3em; }
+     
+
+    </style>
+    <noscript> 
+        <meta http-equiv="refresh" content="0;URL=http://google.com" />
+    </noscript>
+
+    <title> Testing the tabs </title>
+    </head>
+    <body>
+
+     <div id="tabs"> 
+        <ul>
+            <li><a href="#0"><span>Attendance</span></a></li>
+            <li><a href="#1"><span>Others</span></a></li>
+        </ul>
+         <div id="0">  
+         
+             <table>
+               <tr>
+                     <td id="desc">
+                         Section:
+                     </td>
+                     <td>	
+            	          <input id="sections" class="textbox" name="sections">                 
+                     </td>
+                     <td>
+            	          <div id="radio">
+			      <input type="radio" id="radio1" name="radio" checked="checked" /><label for="radio1">Lecture</label>
+			      <input type="radio" id="radio2" name="radio"/><label for="radio2">Laboratory</label>  
+                        </div>
+                     </td>
+                     <td>
+                         <button> Attendance Form </button>
+                     </td>
+                 </tr>
+                
+                 
+             </table>
+             <div id="dvattendance" class="ui-widget">
+             <table id="students_attendance" class="ui-widget ui-widget-content">
+                 <caption> Class Attendance </caption>
+                 <!-- table header -->
+                 <thead>
+                      <tr class="ui-widget-header">
+    		        <th scope="col"> Id No </th>
+                        <th scope="col"> Name </th>
+                        <th scope="col"> Time In </th>
+                     </tr>
+                  </thead>
+                  <tbody>
+	                
+	           </tbody>
+              </table> <!-- datatable -->
+              </div> <!-- ui widget -->
+         </div> <!-- id = 0 -->
+        
+        <div id="attendance-form" title="Attendance"> 
+            <table style="text-align: left; width: 100%;" cellpadding="2" cellspacing="2">
+              <tr>
+                <td>
+               	   <form>
+               	         <fieldset>
+               	 	     <label for="dfidnumber">ID Number:</label>
+               	 	     <input type="text" name="dfidnumber" id="dfidnumber" class="textbox ui-widget-content ui-corner-all" />
+               	 	     <label for="dfname"> Name: </label>
+                	     <input type="text" name="dfname" id="dfname" class="textbox ui-widget-content ui-corner-all" />
+                	     <label for="dftimein"> Time: </label>
+                	     <input type="text" name="dftimein" id="dftimein" class="textbox ui-widget-content ui-corner-all" />
+                             <label for="dfattcount"> Attendance Count: </label>
+                	     <input type="text" name="dfattcount" id="dfattcount" class="textbox ui-widget-content ui-corner-all" />
+                	 </fieldset>
+            	   </form>
+                  </td>
+                  <td>
+                     <image src="pics/anonymous.jpg" class="r50" id="frmpic">
+                  </td>
+               </tr>
+	     </table> <!-- attendance entry dialog -->
+        </div> <!-- attendance form -->
+
+        <div id="warning" title="Reminder">
+            Please select a section before proceeding.
+        </div>
+
+         <div id="1">
+                sdfsdf
+         </div>
+      </div>  <!-- tabs -->
+</body>
+</html>
