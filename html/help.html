@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Gradebook</title>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="../javascript/jquery/css/south-street/jquery-ui-1.8.12.custom.css" />
+<script type="text/javascript" src="../javascript/jquery/js/jquery-1.5.1.min.js"> </script>
+<script type="text/javascript" src="../javascript/ajaxQueries.js"> </script>
+
+</head>
+
+<body onload="getClasses()">
+<div class="div_parentcontent"> <!-- edited up to.. -->
+<div>
+<table class="table_header">
+	<tr>
+		<td width="20em" id="minlogo_td"><img src="pictures/logo_mini.png"></td>
+		<td colspan="5" id="head"><p class="header_text" style="text-align:right"><a href="help.html">Help</a> &nbsp;  | &nbsp;  <a href="../scripts/form/logout">Logout</a></p></td>
+	</tr>
+	<tr>
+		<td id="home2" colspan="6"><p class="header_text" style="padding: 0.8em 0em 1em 2em"><a href="ind.html">Home</a></p>
+
+</td>
+	</tr>
+</table>
+</div>
+<br>
+<div class="class_content">
+<div class="help_content">
+<a href="grades.html"><button id="back_button"><< Back to gradebook</button></a>
+<h2>Category Aggregation</h2>
+
+<p>This menu lets you choose the aggregation strategy that will be used to calculate each participant's overall grade for this category. The different options are explained below.</br></br>
+The grades are first converted to percentage values (interval from 0 to 1, this is called normalisation), then aggregated using one of the functions below and finally converted to the associated category item's range (between Minimum grade and Maximum grade). </br></br>
+<b>Important:</b> An empty grade is simply a missing gradebook entry, and could mean different things. For example, it could be a participant who hasn't yet submitted an assignment, an assignment submission not yet graded by the teacher, or a grade that has been manually deleted by the gradebook administrator. Caution in interpreting these "empty grades" is thus advised.</br></br></p>
+
+<dl>
+	<dt>Mean of Grades</dt>
+	<dd>The sum of all grades divided by the total number of grades.</dd>
+	<dd class="example">A1 70/100, A2 20/80, A3 10/10, category max 100:</br>
+	<code>(0.7 + 0.25 + 1.0)/3 = 0.65 --> 65/100</code></dd>
+
+	<dt>Weighted mean</dt>
+	<dd>Each grade item can be given a weight, which is then used in the arithmetic mean aggregation to influence the importance of each item in the overall mean.</dd>
+	<dd class="example">A1 70/100 weight 10, A2 20/80 weight 5, A3 10/10 weight 3, category max 100:</br>
+	<code>(0.7*10 + 0.25*5 + 1.0*3)/18 = 0.625 --> 62.5/100</code></dd>
+
+	<dt>Simple weighted mean</dt>
+	<dd>The difference from Weighted mean is that weight is calculated as Maximum grade - Minimum grade for each item. 100 point assignment has weight 100, 10 point assignment has weight 10.</dd>
+	<dd class="example">A1 70/100, A2 20/80, A3 10/10, category max 100:</br>
+	<code>(0.7*100 + 0.25*80 + 1.0*10)/190 = 0.526 --> 52.6/100</code></dd>
+
+	<dt>Mean of grades (with extra credits)</dt>
+	<dd>Arithmetic mean with a twist. An old, now unsupported aggregation strategy provided here only for backward compatibility with old activities.</dd>
+
+	<dt>Median of grades</dt>
+	<dd>The middle grade (or the mean of the two middle grades) when grades are arranged in order of size. The advantage over the mean is that it is not affected by outliers (grades which are uncommonly far from the mean).</dd>
+	<dd class="example">A1 70/100, A2 20/80, A3 10/10, category max 100:</br>
+	<code>median(0.7 ; 0.25 ; 1.0) = 0.7 --> 70/100</code></dd>
+
+	<dt>Smallest grade</dt>
+	<dd>The result is the smallest grade after normalisation. It is usually used in combination with Aggregate only non-empty grades.</dd>
+	<dd class="example">A1 70/100, A2 20/80, A3 10/10, category max 100:</br>
+	<code>min(0.7 ; 0.25 ; 1.0) = 0.25 --> 25/100</code></dd>
+
+	<dt>Highest grade</dt>
+	<dd>The result is the highest grade after normalisation.</dd>
+	<dd class="example">A1 70/100, A2 20/80, A3 10/10, category max 100:</br>
+	<code>max(0.7 ; 0.25 ; 1.0) = 1.0 --> 100/100</code></dd>
+
+	<dt>Mode of grades</dt>
+	<dd>The mode is the grade that occurs the most frequently. It is more often used for non-numerical grades. The advantage over the mean is that it is not affected by outliers (grades which are uncommonly far from the mean). However it loses its meaning once there is more than one most frequently occurring grade (only one is kept), or when all the grades are different from each other.</dd>
+	<dd class="example">A1 70/100, A2 35/50, A3 20/80, A4 10/10, A5 7/10 category max 100:</br>
+	<code>mode(0.7 ; 0.7 ; 0.25 ; 1.0 ; 0.7) = 0.7 --> 70/100</code></dd>
+
+	<dt>Highest grade</dt>
+	<dd>The result is the highest grade after normalisation.</dd>
+	<dd class="example">A1 70/100, A2 20/80, A3 10/10, category max 100:</br>
+	<code>max(0.7 ; 0.25 ; 1.0) = 1.0 --> 100/100</code></dd>
+
+	<dt>Sum of grades</dt>
+	<dd>The sum of all grade values. Scale grades are ignored. This is the only type that does not convert the grades to percentages internally (normalisation). The Maximum grade of associated category item is calculated automatically as a sum of maximums from all aggregated items.</dd>
+	<dd class="example">A1 70/100, A2 20/80, A3 10/10:</br>
+	<code>70 + 20 + 10 = 100/190</code></dd>
+
+</dl>
+</div>
+</div>
+	<p id="footer">&copy; my.Eskwela 2011</p>
+</div>
+</body>
+</html>

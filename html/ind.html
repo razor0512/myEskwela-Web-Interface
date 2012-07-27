@@ -1,0 +1,77 @@
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" /> 
+<title>Gradebook</title>
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+<link rel="stylesheet" type="text/css" href="../javascript/jquery/css/south-street/jquery-ui-1.8.12.custom.css" />
+<script type="text/javascript" src="../javascript/jquery/js/jquery-1.5.1.min.js"> </script>
+<script type="text/javascript" src="../javascript/ajaxQueries.js"> </script>
+
+</head>
+
+<body onload="getClasses()">
+<div class="div_parentcontent"> <!-- edited up to.. -->
+
+<table style="width: 100%">
+	<tr>
+		<td width="20em" id="minlogo_td"><img src="pictures/logo_mini.png"><br></td>
+		<td><p class="header_text" style="text-align:right"><a href="help.html">Help</a> &nbsp;  | &nbsp;  <a href="../scripts/form/logout">Logout</a></p></td>
+	</tr>
+
+	<tr>
+		<td id="home2" colspan="2"><p class="header_text" style="padding: 0.8em 0em 1em 2em"><a href="ind.html">Home</a></p></td>
+	</tr>
+</table>
+<br>
+<!--<div class="div_transparent">-->
+<div class="div_accountinfo">
+Account Information</div>
+<div class="div_teacherinfo">
+<table class="table_teacherinfo" id="teacherInfo">
+	<tr>
+	    <td rowspan="5" class="picturecell"></td>
+	</tr>
+	<tr>
+	    <td id="td_teacherlabel">Name:</td>
+		<td class="td_teacherinfo">&nbsp;</td>
+
+	</tr>
+	<tr>
+	    <td id="td_teacherlabel">Faculty ID Number:</td>
+		<td class="td_teacherinfo">&nbsp;</td>
+	</tr>
+	<tr>
+	    <td id="td_teacherlabel">Department:</td>
+		<td class="td_teacherinfo">&nbsp;</td>
+	</tr>
+	<tr>
+	    <td id="td_teacherlabel">College:</td>
+		<td class="td_teacherinfo">&nbsp;</td>
+	</tr>
+</table>
+</div>
+<!--</div>-->
+
+</br>
+</br>
+
+<table class="table_classlists" id="classList">
+	<tr>
+	    <th id="td_code">Code</th>
+	    <th id="td_section">Section</th>
+	    <th id="td_desc">Description</th>
+	    <th id="td_day">Day</th>
+	    <th id="td_time">Time</th>
+	    <th id="td_room">Room</th>
+	    <th id="td_type">Type</th>
+	    <th id="td_units">Units</th>
+	    <th id="td_action">Action</th>
+	</tr>
+		
+</table>
+</div>
+	<p id="footer">&copy; my.Eskwela 2011</p>
+</div>
+</body>
+</html>

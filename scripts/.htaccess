@@ -1,0 +1,11 @@
+SetHandler mod_python
+#PythonHandler mod_python.cgihandler
+
+#AddHandler mod_python .psp
+#PythonHandler mod_python.psp
+
+AddHandler mod_python .py
+PythonHandler mod_python.publisher
+
+PythonDebug On
+
