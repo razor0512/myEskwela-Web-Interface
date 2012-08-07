@@ -662,12 +662,4 @@ function getScore(){
 	
 }
 //add score!
-function addAttendance(idnum, sname){
-	$.post('../scripts/queries/addAttendance',{idnum_:idnum, studentname_:sname},function(data){
-		if(data.length>0){
-    		if(data=="False"){
-				alert("Error!!!")
-			}
-		}
-	});
-}
+

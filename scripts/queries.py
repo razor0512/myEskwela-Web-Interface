@@ -1,8 +1,6 @@
 from dosql import *
 import cgi
 from mod_python import Session
-import time
-import os
 
 def getClasses(req):
 	session = Session.Session(req)
@@ -206,6 +204,7 @@ def updatePerformance(req, perfID1, score1_, score2_, mult, grpPerfID, regID):
 	f = a.execqry("select updateperformance('"+session['sCode']+"', '"+oI+"', '"+oS+"', '"+uS+"', '"+oM+"', '"+oG+"', '"+oR+"')", True)
 	return True
 
+
 def getScore(req):
 	session = Session.Session(req)
 	a = doSql()
@@ -220,32 +219,4 @@ def addScore(req, score, mult):
 	f = e.execqry("select addscore('"+session['sCode']+"','"+b+"','"+c+"')", True)
 	return True
 
-def addAttendance(req, idnum_, studentname_):
-	session = Session.Session(req)	
-	b = cgi.escape(idnum_)
-	c = cgi.escape(studentname_)
-	x = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-	e = doSql()
-	#f = e.execqry("INSERT INTO attendancetemp VALUES('"+b+"','"+c+"','"+x+"','"+session['sCode']+"')", True)
-	f = e.execqry("SELECT addattend('"+b+"','"+c+"','"+x+"','"+session['sCode']+"')", True)
-	#f = e.execqry("SELECT addattend('"+c+"')", True)
-
-	return True
-	
-def changePassword(req, currentPassword, confirmPassword, newPassword):
-	session = Session.Session(req)
-	if currentPassword == confirmPassword:
-		a = doSql()
-		f = a.execqry("select username from user_account where acct_id = '"+session['id']+"'", False)
-		b = a.execqry("SELECT changepass('"+newPassword+"','"+f+"')", True)
-		return True
-	else:
-		return False
-	
-def resetPassword(req):
-	session = Session.Session(req)
-	randPassword = os.urandom(string_length)
-	a = doSql()
-	f = a.execqry("SELECT changepass('"+randPassword+"','"+f+"')", True)
-	return True
 
