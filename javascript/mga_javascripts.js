@@ -460,27 +460,28 @@ $( "#attendanceform" ).dialog({
 	buttons: {
 		
 		"Save": function() {
-			
+			//addAttendance(idnumber.val(), studname.val())
+		//	$( this ).dialog( "close" );
 			var bValid = true;
 			allFields2.removeClass( "ui-state-error" );
 
-			bValid = bValid && checkLength( idnumber, "idnumber", 1, 10 );
-			bValid = bValid && checkLength( attenddate, "studname", 1, 10 );
-			bValid = bValid && checkLength( attenddate, "attenddate", 1, 10 );
-			bValid = bValid && checkLength( attenddate, "attendcount", 1, 10 );
+	//		bValid = bValid && checkLength( idnumber, "idnumber", 1, 10 ); 
+		//	bValid = bValid && checkLength( attenddate, "studname", 1, 10 );
+	//		bValid = bValid && checkLength( attenddate, "attenddate", 1, 10 );
+	//		bValid = bValid && checkLength( attenddate, "attendcount", 1, 10 );
 		
-			bValid = bValid && checkRegexp( idnumber, /^[A-Z]([0-9a-zA-Z])+$/i, "Range: 0-100" );
-			bValid = bValid && checkRegexp( studname, /^[A-Z]([0-9a-zA-Z])+$/i, "Range: 0-100" );
-			bValid = bValid && checkRegexp( attenddate, /^/i, "Date" );			
-			bValid = bValid && checkRegexp( idnumber, /^([0-9])+$/i, "Range 0-100" );
+	//		bValid = bValid && checkRegexp( idnumber, /^[A-Z]([0-9a-zA-Z])+$/i, "Range: 0-100" );
+		//	bValid = bValid && checkRegexp( studname, /^[A-Z]([0-9a-zA-Z])+$/i, "Range: 0-100" );
+	//		bValid = bValid && checkRegexp( attenddate, /^/i, "Date" );			
+	//		bValid = bValid && checkRegexp( idnumber, /^([0-9])+$/i, "Range 0-100" ); 
 			
 
 			if ( bValid ) {
 					
-				addAttendance( idnumber.val(), studname.val(), attenddate.val(), attendcount.val())
-						 
+			   addAttendance($("#idnumber").val(), $("#studname").val());
+			  //  alert($("#idnumber").val());
 				$( this ).dialog( "close" );
-			}
+			} 
 			},
 			Cancel: function() {
 				$( this ).dialog( "close" );
@@ -521,13 +522,13 @@ $(function() {
 	});
 
 
-/* -------------------------- DATE PICKER FOR ATTENDANCE-------------------------------- */
+/* -------------------------- DATE PICKER FOR ATTENDANCE-------------------------------- 
 
 $(function() {
 
 		$( "#attenddate" ).datepicker();
 
-	});
+	}); */
 
 
 /*-------------------------------------------------------*/
