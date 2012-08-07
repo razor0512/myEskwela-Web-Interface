@@ -1,0 +1,210 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D04885F815C8BCC300176B74 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = D04885F715C8BCC300176B74 /* main.c */; };
+		D04885FA15C8BCC300176B74 /* pda_complement.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = D04885F915C8BCC300176B74 /* pda_complement.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D04885F115C8BCC300176B74 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				D04885FA15C8BCC300176B74 /* pda_complement.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		D04885F315C8BCC300176B74 /* pda complement */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pda complement"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D04885F715C8BCC300176B74 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		D04885F915C8BCC300176B74 /* pda_complement.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = pda_complement.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D04885F015C8BCC300176B74 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D04885E815C8BCC200176B74 = {
+			isa = PBXGroup;
+			children = (
+				D04885F615C8BCC300176B74 /* pda complement */,
+				D04885F415C8BCC300176B74 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D04885F415C8BCC300176B74 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D04885F315C8BCC300176B74 /* pda complement */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D04885F615C8BCC300176B74 /* pda complement */ = {
+			isa = PBXGroup;
+			children = (
+				D04885F715C8BCC300176B74 /* main.c */,
+				D04885F915C8BCC300176B74 /* pda_complement.1 */,
+			);
+			path = "pda complement";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D04885F215C8BCC300176B74 /* pda complement */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D04885FD15C8BCC300176B74 /* Build configuration list for PBXNativeTarget "pda complement" */;
+			buildPhases = (
+				D04885EF15C8BCC300176B74 /* Sources */,
+				D04885F015C8BCC300176B74 /* Frameworks */,
+				D04885F115C8BCC300176B74 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "pda complement";
+			productName = "pda complement";
+			productReference = D04885F315C8BCC300176B74 /* pda complement */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D04885EA15C8BCC200176B74 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0430;
+			};
+			buildConfigurationList = D04885ED15C8BCC300176B74 /* Build configuration list for PBXProject "pda complement" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D04885E815C8BCC200176B74;
+			productRefGroup = D04885F415C8BCC300176B74 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D04885F215C8BCC300176B74 /* pda complement */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D04885EF15C8BCC300176B74 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D04885F815C8BCC300176B74 /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D04885FB15C8BCC300176B74 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		D04885FC15C8BCC300176B74 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D04885FE15C8BCC300176B74 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D04885FF15C8BCC300176B74 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D04885ED15C8BCC300176B74 /* Build configuration list for PBXProject "pda complement" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D04885FB15C8BCC300176B74 /* Debug */,
+				D04885FC15C8BCC300176B74 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D04885FD15C8BCC300176B74 /* Build configuration list for PBXNativeTarget "pda complement" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D04885FE15C8BCC300176B74 /* Debug */,
+				D04885FF15C8BCC300176B74 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D04885EA15C8BCC200176B74 /* Project object */;
+}

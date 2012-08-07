@@ -1,0 +1,447 @@
+<html>
+  <head>
+	<link rel="stylesheet" type="text/css" href="../javascript/jquery/css/south-street/jquery-ui-1.8.12.custom.css" />
+	<link href="css/style.css" media="all" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../javascript/jquery/js/jquery-1.5.1.min.js"> </script>
+	<script type="text/javascript" src="../javascript/jquery/js/jquery-ui-1.8.12.custom.min.js"></script>
+	<script type="text/javascript" src="../javascript/apMessage.js"></script>
+	 <script type="text/javascript" src="../javascript/ajaxQueries.js"></script>
+	<script type="text/javascript" src="../javascript/mga_javascripts.js"></script>
+
+
+	<script type="text/javascript" src="spec/jquery.js"></script>
+        <script type="text/javascript" src="spec/jquery.ui.js"></script>
+        <script type="text/javascript" src="js/jquery.editinplace.js"></script>
+        <script type="text/javascript" src="js/editable.js"></script>
+        <link rel="stylesheet" href="./css/styles.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+    <noscript> 
+        <meta http-equiv="refresh" content="0;URL=http://google.com" />
+    </noscript>
+
+    <title> Gradebook</title>
+	
+  </head>
+
+  <body onload="getStudents()">
+	<div class="div_parentcontent">
+	<div class="div_header">
+<table class="table_header">
+	<tr>
+		<td width="20em" id="minlogo_td"><img src="pictures/logo_mini.png"></td>
+		<td colspan="5" id="head"><p class="header_text" style="text-align:right"><a href="help.html">Help</a> &nbsp;  | &nbsp;  <a href="../scripts/form/logout">Logout</a></p></td>
+	</tr>
+	<tr>
+		<td id="home" colspan="6"><p class="header_text" style="padding: 0.8em 0em 1em 2em"><a href="ind.html">Home</a></p>
+
+</td>
+	</tr>
+	
+	<tr>
+		<td id="subjcode" colspan="6"><p></p></td>
+		<!--<td id="subname"></td>
+		<td id="type"></td>
+		<td id="sec_code"></td>
+		<td id="subj_time"></td>-->
+	</tr>
+</table>
+	
+	
+</div><!--end of div_header-->
+<br> 
+
+<div class="div_content">
+	
+	<div id="tabs"> 
+        <ul>
+            <li><a href="#0"><span>Scale</span></a></li>
+            <li><a href="#1"><span>Categories</span></a></li>
+	    <li><a href="#2"><span>Grades</span></a></li>
+	    <li><a href="#3"><span>Report</span></a></li>
+	    <li><a href="#4"><span>Attendance</span></a></li>
+        </ul>
+<div id="0">
+
+	<div id="dvscale" class="ui-widget">
+		
+
+             <table class="ui-widget ui-widget-content" id="grdscale">
+			 <caption> Grading Scale </caption>
+					
+                 <!-- table header -->
+                 <thead>
+                      <tr class="ui-widget-header">
+				<th scope="col"> Highest % Range </th>
+				<th scope="col"> Lowest % Range</th>
+        	                <th scope="col"> Equivalent Grade </th>
+                     </tr>
+                  </thead>
+               			 <tbody>
+					<!-- diri masulod ang scale na table gikan sa db -->
+					
+	                
+				</tbody>
+				
+              </table> <!-- datatable -->		
+
+
+		<!-- <div class="button">
+			<input type="submit" value="Save"/>
+			<input type="submit" value="Cancel"/> -->
+		<!--</div><!-- end button -->                    
+				
+              </div> <!-- ui widget -->
+		
+	
+		<div class="instructions_dialog">
+
+			<p><strong>Directions: </strong> </br>
+			Click on each table cell to edit your grading scale.</p>
+
+		</div>
+			  
+		</div>
+
+
+	<div id="1">
+		<div id="dvscale" class="ui-widget">
+			<div>
+		<div id="dialog-form" title="Add New Category">
+				
+			<p class="validateTips">All form fields are required.</p>
+
+				<form class="form">
+					<fieldset>
+						<label for="name">Category Name</label>
+							<input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+						<label for="weight">Weight</label>
+							<input type="text" name="weight" id="weight" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+						<label for="aggregation">Aggregation</label>
+							<select type="aggregation" name="aggregation" id="aggregation" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+								<option>Weighted Mean of Grades</option>
+								<option>Mean of Grades</option>
+								<option>Simple Weighted Mean of Grades</option>
+								<option>Mean of Grades w/ Extra Credits</option>
+								<option>Lowest Grade</option>
+								<option>Mode of Grades</option>
+								<option>Highest Grade</option>
+								<option>Sum of Grades</option>
+							</select>			
+					</fieldset>
+				</form>
+		</div><!-- end of div id=dialog-form -->
+
+<!-- sugod -->
+<div id="dialog-form2" title="Update Category">
+				
+			<p class="validateTips">All form fields are required.</p>
+
+				<form class="form">
+					<fieldset>
+							<input type="hidden" name="origname" id="origname" />
+						<label for="name1">Category Name</label>
+							<input type="text" name="name1" id="name1" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+						<label for="weight1">Weight</label>
+							<input type="text" name="weight1" id="weight1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+						<label for="aggregation1">Aggregation</label>
+							<select type="aggregation" name="aggregation1" id="aggregation1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+								<option>Weighted Mean of Grades</option>
+								<option>Mean of Grades</option>
+								<option>Simple Weighted Mean of Grades</option>
+								<option>Mean of Grades w/ Extra Credits</option>
+								<option>Lowest Grade</option>
+								<option>Mode of Grades</option>
+								<option>Highest Grade</option>
+								<option>Sum of Grades</option>
+							</select>			
+					</fieldset>
+				</form>
+		</div><!-- end of div id=dialog-form -->
+<!-- taman dri... -->
+
+		<div id="users-contain">
+			<table class="ui-widget ui-widget-content" id="users">
+				<caption> Categories </caption>
+				<thead>
+					<tr class="ui-widget-header">
+						<th scope="col">Name</th>
+						<th scope="col">Weight(%)</th>
+						<th scope="col">Aggregation</th>
+						<th scope="col">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					
+				</tbody>
+			</table>
+		</div><!-- end of div id="users contain" -->
+		
+		<button id="add-cat">Add Category</button>
+
+	</div> <!-- end of div -->
+	</div>
+</div> <!-- end of div id=1 -->
+
+<div id="2">
+<div id="dvscale" class="ui-widget">
+	<div id="dialog-form1" title="Add Grade Item">
+		<p class="validateTips">All form fields are required.</p>
+			<form>
+				<fieldset>
+					
+					<label id="grdcatitem" for="grdcat" >Category Name</label>
+						<select type="text" name="grdcatitem" id="grdcat1" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3" />
+
+					</select> <br /><br />
+									
+					<label for="description">Description</label>
+						<input type="text" name="description" id="description" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+					<label for="maxscore">Max Score</label>
+						<input type="text" name="maxscore" id="maxscore" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3" />
+					<label for="period">Period</label>
+						<select type="text" name="period" id="period" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3" />
+							<option>Prelim</option>
+							<option>Midterm</option>
+							<option>Finals</option>
+						</select> <br /><br />
+					<label for="date" >Date</label>
+						<input type="text" name="date" id="date" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3" />
+				</fieldset>
+			</form>
+	</div><!-- end of div id="dialogform1" -->
+
+
+
+	<div id="addscore" title="Add Score">
+		<form>
+		<div id="dvscale" class="ui-widget">             
+		<table class="ui-widget ui-widget-content"  id="score">
+                 <thead>
+				<tr class="ui-widget-header">
+					<th scope="col"> Name</th>
+					<th scope="col"> Score</th>		
+				</tr>
+                  </thead>
+                  <tbody>
+			<!----list of students here---->
+
+			</tbody>		
+        	 </table> <!-- end of datatable2 -->
+
+	
+			</div> <!-- end of div id="dvscale" -->
+	
+
+	</form>
+	</div>
+
+
+<!-- sugod -->
+
+<div id="dialog-form6" title="Update Performance">
+				
+			<p class="validateTips">All form fields are required.</p>
+
+				<form class="form">
+					<fieldset>
+							<input type="hidden" name="origscore" id="origscore" />
+
+						<label for="perfID1">Perf ID</label>
+							<input type="text" name="perfID1" id="perfID1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+						
+			
+						<label for="mult1">Mult</label>
+						<select type="text" name="mult1" id="mult1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3" />
+							<option>1</option>
+							<option>0</option>
+							<option>-1</option>
+						</select>
+
+						<label for="score1">Score</label>
+							<input type="text" name="score1" id="score1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+
+						<label for="grpPerfID1">Grp Perf ID</label>
+							<input type="text" name="grpPerfID1" id="grpPerfID1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+
+						<label for="regID1">Reg ID</label>
+							<input type="text" name="regID1" id="regID1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+
+
+								
+					</fieldset>
+				</form>
+		</div><!-- end of div id=dialog-form -->
+<!-- taman dri... -->
+
+<!------View Students--->
+
+	<div id="dialog-form3" title="View Students">
+			<form>
+			<div id="dvscale" class="ui-widget">             
+		<table class="ui-widget ui-widget-content"  id="studList">
+                 <thead>
+				<tr class="ui-widget-header">
+					<th scope="col"> Name</th>
+					<th scope="col"> ID Number</th>
+					<th scope="col"> Mult</th>
+					<th scope="col"> Score </th>
+					<th scope="col"> Action</th>
+							
+				</tr>
+                  </thead>
+                  <tbody>
+			<!----list of students here---->
+
+			</tbody>		
+        	 </table> <!-- end of datatable2 -->
+
+	
+			</div> <!-- end of div id="dvscale" -->
+	
+
+	</form>
+	</div><!-- end of div id="dialogform3" --> 
+	
+
+		<button id="add-grditem">Add Grade Item</button>
+		
+
+<!-- sugod -->
+<div id="dialog-form5" title="Update Grade Item">
+				
+			<p class="validateTips">All form fields are required.</p>
+
+				<form class="form">
+					<fieldset>
+							<input type="hidden" name="origgrade" id="origgrade" />
+
+						<label id="grdcatitem" for="grdcat" >Category Name</label>
+						<select type="text" name="grdcatitem" id="grdcat2" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3" />
+
+					</select> <br /><br />
+
+						<label for="grade1">Name of Grade Item</label>
+							<input type="text" name="grade1" id="grade1" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+						<label for="maxscore1">Max Score</label>
+							<input type="text" name="maxscore1" id="maxscore1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+						<label for="date1">Date</label>
+							<input type="text" name="date1" id="date1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"/>
+						<label for="period1">Period</label>
+						<select type="text" name="period1" id="period1" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3" />
+							<option>Prelim</option>
+							<option>Midterm</option>
+							<option>Finals</option>
+						</select>		
+					</fieldset>
+				</form>
+		</div><!-- end of div id=dialog-form -->
+<!-- taman dri... -->
+		
+		
+		
+		<div id="users-contain">			
+		<table class="ui-widget ui-widget-content"  id="grpperf">
+			<caption> Grades </caption>
+                 <!-- table header -->
+                 <thead>
+                      <tr class="ui-widget-header">
+						<th scope="col"> Category Name </th>
+						<th scope="col"> Name of Grade Item </th>
+						<th scope="col"> Max Score </th>
+						<th scope="col"> Period </th>	
+						<th scope="col"> Date </th>
+						<th scope="col"> Action</th>
+                        
+                     </tr>
+                  </thead>
+                <tbody>
+					<!-- diri masulod ang grp_performance na table gikan sa db -->
+					
+	                
+				</tbody>
+				
+              </table> <!-- datatable -->
+	</div>
+		
+</div> 
+
+</div> <!-- end of div id=2 -->
+
+<div id="3">	
+	<div id="dvscale" class="ui-widget">             
+		<table class="ui-widget ui-widget-content"  id="students">
+			<caption> Grade Report </caption>
+                 <thead>
+						<tr class="ui-widget-header">
+							<th scope="col"> Student Name</th>
+							<th scope="col"> ID Number</th>
+							<div id="headRep">
+							</div>
+							
+							<th scope="col"> Grade</th>
+
+						</tr>
+                  </thead>
+                  <tbody></tbody>		
+         </table> <!-- end of datatable2 -->
+
+
+			<button>Export Grades</button>
+			
+	</div> <!-- end of div id="dvscale" -->
+</div> <!-- end of div id=3 -->
+
+<div id="4">
+	<div id="dvscale" class="ui-widget">             
+
+
+		<button id="attendance-form">Attendance Form</button> 
+		<table class="ui-widget ui-widget-content"  id="attendance">
+			<caption> Class Attendance </caption>
+                 <thead>
+						<tr class="ui-widget-header">
+							<th scope="col"> <center> ID Number <center> </th>
+							<th scope="col"> <center> Student Name <center> </th>
+							<th scope="col"> <center> Time In <center> </th>
+						</tr>
+                  </thead>
+                  <tbody>
+
+		</tbody>		
+         </table> 
+
+	<div id="attendanceform" title="Attendance Form">
+			<p class="validateTips">All form fields are required.</p>
+			<form>
+				<fieldset>
+					
+					<label id="idnumber" for="idnumber" >ID Number</label>
+						<input type="text" name="idnumber" id="idnumber" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+
+					<label id="studname" for="studname" >Student Name</label>
+						<input type="text" name="studname" id="studname" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+									
+					<label for="attenddate">Time</label>
+						<input type="text" name="attenddate" id="attenddate" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+				
+					<label id="attendcount" for="attendcount" >Attendance Count</label>
+						<input type="text" name="attendcount" id="attendcount" value="" class="text ui-widget-content ui-corner-all" style="border: 1px solid #b3b3b3"  />
+
+					
+				</fieldset>
+			</form>
+	</div><!-- end of div id="attendanceform" --> 
+
+			
+			
+	</div> <!-- end of div id="dvscale" -->
+    
+</div> <!-- end of div id=4 -->
+        
+        
+</div>  
+</div>
+	<p id="footer">&copy; my.Eskwela 2011</p>
+</div>
+</div> 
+</body>
+</html>
